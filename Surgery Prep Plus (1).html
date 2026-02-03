@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OP-Vorbereitung Assistent</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--bg-secondary);
+            overflow-x: auto;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .nav-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: #e5e7eb;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .checklist-item.completed {
+            background: #d1fae5;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .countdown {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .countdown-time {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .medication-item,
+        .document-item,
+        .appointment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .medication-schedule {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .time-slot {
+            padding: 8px;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, #059669 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .icon {
+            font-size: 1.5rem;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-secondary);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background: #e0e7ff;
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary-color);
+            background: #dbeafe;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .uploaded-file img {
+            max-width: 60px;
+            max-height: 60px;
+            border-radius: 4px;
+            margin-right: 12px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .recording-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .recording-indicator {
+            width: 20px;
+            height: 20px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .pain-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .pain-level {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .pain-level:hover {
+            transform: scale(1.1);
+        }
+
+        .pain-level.selected {
+            border-width: 3px;
+            transform: scale(1.15);
+        }
+
+        .vital-signs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .vital-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .measurement-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .custom-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px 8px;
+        }
+
+        .delete-btn:hover {
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .nav-tab {
+                padding: 12px 10px;
+                font-size: 0.85rem;
+                min-width: 100px;
+            }
+
+            .countdown-time {
+                font-size: 2rem;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 OP-Vorbereitung Assistent</h1>
+            <p>Ihr digitaler Begleiter für eine sichere Operation</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">Übersicht</button>
+            <button class="nav-tab" onclick="switchTab('info')">OP-Info</button>
+            <button class="nav-tab" onclick="switchTab('documents')">Dokumente</button>
+            <button class="nav-tab" onclick="switchTab('medications')">Medikamente</button>
+            <button class="nav-tab" onclick="switchTab('checklist')">Checkliste</button>
+            <button class="nav-tab" onclick="switchTab('appointments')">Termine</button>
+            <button class="nav-tab" onclick="switchTab('recordings')">Aufnahmen</button>
+            <button class="nav-tab" onclick="switchTab('pain')">Schmerzen</button>
+            <button class="nav-tab" onclick="switchTab('vitals')">Vitalwerte</button>
+            <button class="nav-tab" onclick="switchTab('packing')">Packliste</button>
+        </div>
+
+        <div class="content">
+            <div id="overview" class="tab-content active">
+                <div class="countdown">
+                    <h2>⏰ Zeit bis zur Operation</h2>
+                    <div class="countdown-time" id="countdownDisplay">--:--:--</div>
+                    <p id="countdownText">Noch nicht eingestellt</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="stat-card">
+                        <div class="icon">✅</div>
+                        <div class="stat-value" id="completedTasks">0</div>
+                        <p>Erledigte Aufgaben</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">📋</div>
+                        <div class="stat-value" id="totalTasks">0</div>
+                        <p>Gesamtaufgaben</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">📊 Fortschritt</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%">0%</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">⚠️ Wichtige Hinweise</div>
+                    <div class="alert alert-warning">
+                        <span>⚡</span>
+                        <span>Denken Sie daran, 6 Stunden vor der OP nichts mehr zu essen!</span>
+                    </div>
+                    <div class="alert alert-info">
+                        <span>💧</span>
+                        <span>Klare Flüssigkeiten bis 2 Stunden vor der OP erlaubt</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="info" class="tab-content">
+                <div class="card">
+                    <div class="card-header">📝 OP-Informationen</div>
+                    <div class="form-group">
+                        <label>Art der Operation</label>
+                        <input type="text" id="surgeryType" placeholder="z.B. Kniearthroskopie">
+                    </div>
+                    <div class="form-group">
+                        <label>OP-Datum</label>
+                        <input type="date" id="surgeryDate">
+                    </div>
+                    <div class="form-group">
+                        <label>OP-Uhrzeit</label>
+                        <input type="time" id="surgeryTime">
+                    </div>
+                    <div class="form-group">
+                        <label>Krankenhaus/Klinik</label>
+                        <input type="text" id="hospital" placeholder="Name der Einrichtung">
+                    </div>
+                    <div class="form-group">
+                        <label>Operateur/Chirurg</label>
+                        <input type="text" id="surgeon" placeholder="Dr. Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Anästhesieform</label>
+                        <select id="anesthesia">
+                            <option value="">Bitte wählen</option>
+                            <option value="Vollnarkose">Vollnarkose</option>
+                            <option value="Teilnarkose">Teilnarkose/Spinal</option>
+                            <option value="Lokalanästhesie">Lokalanästhesie</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Zusätzliche Notizen</label>
+                        <textarea id="surgeryNotes" placeholder="Weitere wichtige Informationen..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSurgeryInfo()">💾 Speichern</button>
+                </div>
+            </div>
+
+            <div id="documents" class="tab-content">
+                <div class="card">
+                    <div class="card-header">📄 Dokumente & Fotos</div>
+                    
+                    <div class="form-group">
+                        <label>Dokumenttyp</label>
+                        <select id="docType">
+                            <option value="aufklärung">OP-Aufklärung</option>
+                            <option value="wunde">Wunddokumentation</option>
+                            <option value="heilung">Heilungsverlauf</option>
+                            <option value="befund">Befunde/Laborwerte</option>
+                            <option value="rezept">Rezepte</option>
+                            <option value="sonstiges">Sonstiges</option>
+                        </select>
+                    </div>
+
+                    <div class="file-upload-area" id="fileDropZone" onclick="document.getElementById('fileInput').click()">
+                        <p style="font-size: 3rem; margin: 0;">📁</p>
+                        <p style="margin: 10px 0;"><strong>Klicken oder Dateien hierher ziehen</strong></p>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Fotos, PDFs, Dokumente</p>
+                        <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx" style="display: none;">
+                    </div>
+
+                    <div id="uploadedFiles" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <div id="medications" class="tab-content">
+                <div class="card">
+                    <div class="card-header">💊 Medikamentenplan</div>
+                    <div class="form-group">
+                        <label>Medikament</label>
+                        <input type="text" id="medName" placeholder="Name des Medikaments">
+                    </div>
+                    <div class="form-group">
+                        <label>Dosierung</label>
+                        <input type="text" id="medDosage" placeholder="z.B. 500mg">
+                    </div>
+                    <div class="form-group">
+                        <label>Einnahmezeiten (kommagetrennt)</label>
+                        <input type="text" id="medTimes" placeholder="z.B. 8:00, 14:00, 20:00">
+                    </div>
+                    <div class="form-group">
+                        <label>Hinweise</label>
+                        <input type="text" id="medNotes" placeholder="z.B. mit Essen einnehmen">
+                    </div>
+                    <button class="btn btn-primary" onclick="addMedication()">➕ Medikament hinzufügen</button>
+                    <div id="medicationList" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <div id="checklist" class="tab-content">
+                <div class="card">
+                    <div class="card-header">✅ Vorbereitungs-Checkliste</div>
+                    <div id="checklistItems"></div>
+                </div>
+            </div>
+
+            <div id="appointments" class="tab-content">
+                <div class="card">
+                    <div class="card-header">📅 Termine</div>
+                    <div class="form-group">
+                        <label>Terminart</label>
+                        <input type="text" id="aptType" placeholder="z.B. Voruntersuchung">
+                    </div>
+                    <div class="form-group">
+                        <label>Datum</label>
+                        <input type="date" id="aptDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Uhrzeit</label>
+                        <input type="time" id="aptTime">
+                    </div>
+                    <div class="form-group">
+                        <label>Ort/Arzt</label>
+                        <input type="text" id="aptLocation" placeholder="Wo findet der Termin statt?">
+                    </div>
+                    <button class="btn btn-primary" onclick="addAppointment()">➕ Termin hinzufügen</button>
+                    <div id="appointmentList" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <div id="recordings" class="tab-content">
+                <div class="card">
+                    <div class="card-header">🎙️ Sprach- & Textaufnahmen</div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 15px;">🗣️ Speech-to-Text Aufnahme</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Für OP-Berichte und Notizen</p>
+                        <div class="recording-controls">
+                            <button class="btn btn-primary" id="startSpeechBtn" onclick="startSpeechRecognition()">
+                                🎤 Aufnahme starten
+                            </button>
+                            <button class="btn btn-danger hidden" id="stopSpeechBtn" onclick="stopSpeechRecognition()">
+                                ⏹️ Stopp
+                            </button>
+                            <div class="recording-indicator hidden" id="speechIndicator"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Transkribierter Text</label>
+                            <textarea id="transcribedText" placeholder="Der gesprochene Text erscheint hier..." rows="6"></textarea>
+                        </div>
+                        <button class="btn btn-secondary" onclick="saveSpeechText()">💾 Text speichern</button>
+                    </div>
+
+                    <hr style="margin: 30px 0; border: none; border-top: 2px solid var(--border-color);">
+
+                    <div>
+                        <h3 style="margin-bottom: 15px;">🎵 Sprachmemo aufnehmen</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">Für Audio-Notizen</p>
+                        <div class="recording-controls">
+                            <button class="btn btn-primary" id="startAudioBtn" onclick="startAudioRecording()">
+                                🎤 Aufnahme starten
+                            </button>
+                            <button class="btn btn-danger hidden" id="stopAudioBtn" onclick="stopAudioRecording()">
+                                ⏹️ Stopp
+                            </button>
+                            <div class="recording-indicator hidden" id="audioIndicator"></div>
+                        </div>
+                        <div id="audioRecordings" style="margin-top: 20px;"></div>
+                    </div>
+
+                    <hr style="margin: 30px 0; border: none; border-top: 2px solid var(--border-color);">
+
+                    <div>
+                        <h3 style="margin-bottom: 15px;">📝 Gespeicherte Texte</h3>
+                        <div id="savedTexts"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pain" class="tab-content">
+                <div class="card">
+                    <div class="card-header">😰 Schmerzdokumentation</div>
+                    
+                    <h3 style="margin-bottom: 15px;">Visuelle Analogskala (VAS)</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Bitte wählen Sie Ihre aktuelle Schmerzstärke (0 = kein Schmerz, 10 = stärkster Schmerz)</p>
+                    
+                    <div class="pain-scale" id="painScale"></div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>Datum & Uhrzeit</label>
+                        <input type="datetime-local" id="painDateTime">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notizen zum Schmerz</label>
+                        <textarea id="painNotes" placeholder="z.B. stechend, dumpf, bei Bewegung..."></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="addPainEntry()">➕ Schmerz dokumentieren</button>
+
+                    <div class="chart-container">
+                        <h3>Schmerzverlauf</h3>
+                        <canvas id="painChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">💊 Schmerzmittelbedarf</div>
+                    <div class="form-group">
+                        <label>Schmerzmittel</label>
+                        <input type="text" id="painMedName" placeholder="z.B. Ibuprofen">
+                    </div>
+                    <div class="form-group">
+                        <label>Dosierung</label>
+                        <input type="text" id="painMedDose" placeholder="z.B. 400mg">
+                    </div>
+                    <div class="form-group">
+                        <label>Einnahme-Zeitpunkt</label>
+                        <input type="datetime-local" id="painMedTime">
+                    </div>
+                    <button class="btn btn-primary" onclick="addPainMedication()">➕ Einnahme dokumentieren</button>
+
+                    <div class="chart-container">
+                        <h3>Schmerzmitteleinnahme</h3>
+                        <canvas id="painMedChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vitals" class="tab-content">
+                <div class="card">
+                    <div class="card-header">❤️ Vitalwerte-Dokumentation</div>
+                    
+                    <div class="vital-signs-grid">
+                        <div class="vital-input">
+                            <label>Systolisch (mmHg)</label>
+                            <input type="number" id="bpSystolic" placeholder="120">
+                        </div>
+                        <div class="vital-input">
+                            <label>Diastolisch (mmHg)</label>
+                            <input type="number" id="bpDiastolic" placeholder="80">
+                        </div>
+                        <div class="vital-input">
+                            <label>Puls (Schläge/min)</label>
+                            <input type="number" id="pulse" placeholder="70">
+                        </div>
+                        <div class="vital-input">
+                            <label>Datum & Uhrzeit</label>
+                            <input type="datetime-local" id="vitalDateTime">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 15px;" onclick="addVitalSigns()">➕ Messung hinzufügen</button>
+
+                    <div class="chart-container">
+                        <h3>Blutdruckverlauf</h3>
+                        <canvas id="bpChart"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3>Pulsverlauf</h3>
+                        <canvas id="pulseChart"></canvas>
+                    </div>
+
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">📊 Messhistorie</h3>
+                    <div id="vitalHistory"></div>
+                </div>
+            </div>
+
+            <div id="packing" class="tab-content">
+                <div class="card">
+                    <div class="card-header">🎒 Packliste für Krankenhausaufenthalt</div>
+                    
+                    <div class="alert alert-info">
+                        <span>💡</span>
+                        <span>Haken Sie ab, was Sie eingepackt haben, und fügen Sie eigene Gegenstände hinzu</span>
+                    </div>
+
+                    <h3 style="margin: 20px 0 15px 0;">Standard-Packliste</h3>
+                    <div id="standardPackingList"></div>
+
+                    <h3 style="margin: 30px 0 15px 0;">➕ Eigene Gegenstände hinzufügen</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <input type="text" id="customPackItem" placeholder="Gegenstand eingeben..." style="flex: 1;">
+                        <button class="btn btn-primary" onclick="addCustomPackItem()">Hinzufügen</button>
+                    </div>
+
+                    <h3 style="margin: 20px 0 15px 0;">Eigene Listen erstellen</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <input type="text" id="customListName" placeholder="Listenname (z.B. 'Hygiene', 'Unterhaltung')..." style="flex: 1;">
+                        <button class="btn btn-secondary" onclick="createCustomList()">Liste erstellen</button>
+                    </div>
+
+                    <div id="customLists"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js minimal implementation for charts
+        class SimpleChart {
+            constructor(canvas, type) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.type = type;
+                this.data = { labels: [], datasets: [] };
+            }
+
+            update(data) {
+                this.data = data;
+                this.draw();
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                const canvas = this.canvas;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (!this.data.labels || this.data.labels.length === 0) {
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Noch keine Daten vorhanden', canvas.width / 2, canvas.height / 2);
+                    return;
+                }
+
+                const padding = 40;
+                const chartWidth = canvas.width - padding * 2;
+                const chartHeight = canvas.height - padding * 2;
+
+                // Find min and max values
+                let minVal = Infinity;
+                let maxVal = -Infinity;
+                this.data.datasets.forEach(dataset => {
+                    dataset.data.forEach(val => {
+                        minVal = Math.min(minVal, val);
+                        maxVal = Math.max(maxVal, val);
+                    });
+                });
+
+                const range = maxVal - minVal || 1;
+
+                // Draw axes
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, canvas.height - padding);
+                ctx.lineTo(canvas.width - padding, canvas.height - padding);
+                ctx.stroke();
+
+                // Draw data
+                this.data.datasets.forEach((dataset, datasetIndex) => {
+                    ctx.strokeStyle = dataset.borderColor || '#2563eb';
+                    ctx.fillStyle = dataset.borderColor || '#2563eb';
+                    ctx.lineWidth = 2;
+
+                    if (this.type === 'line') {
+                        ctx.beginPath();
+                        dataset.data.forEach((val, i) => {
+                            const x = padding + (i / (this.data.labels.length - 1 || 1)) * chartWidth;
+                            const y = canvas.height - padding - ((val - minVal) / range) * chartHeight;
+                            if (i === 0) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        });
+                        ctx.stroke();
+
+                        // Draw points
+                        dataset.data.forEach((val, i) => {
+                            const x = padding + (i / (this.data.labels.length - 1 || 1)) * chartWidth;
+                            const y = canvas.height - padding - ((val - minVal) / range) * chartHeight;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 4, 0, Math.PI * 2);
+                            ctx.fill();
+                        });
+                    }
+                });
+
+                // Draw labels
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                this.data.labels.forEach((label, i) => {
+                    const x = padding + (i / (this.data.labels.length - 1 || 1)) * chartWidth;
+                    ctx.fillText(label, x, canvas.height - padding + 20);
+                });
+            }
+        }
+
+        // Initialize charts
+        let painChart, painMedChart, bpChart, pulseChart;
+
+        window.addEventListener('load', () => {
+            const painCanvas = document.getElementById('painChart');
+            painCanvas.width = painCanvas.offsetWidth;
+            painCanvas.height = 300;
+            painChart = new SimpleChart(painCanvas, 'line');
+
+            const painMedCanvas = document.getElementById('painMedChart');
+            painMedCanvas.width = painMedCanvas.offsetWidth;
+            painMedCanvas.height = 300;
+            painMedChart = new SimpleChart(painMedCanvas, 'line');
+
+            const bpCanvas = document.getElementById('bpChart');
+            bpCanvas.width = bpCanvas.offsetWidth;
+            bpCanvas.height = 300;
+            bpChart = new SimpleChart(bpCanvas, 'line');
+
+            const pulseCanvas = document.getElementById('pulseChart');
+            pulseCanvas.width = pulseCanvas.offsetWidth;
+            pulseCanvas.height = 300;
+            pulseChart = new SimpleChart(pulseCanvas, 'line');
+        });
+
+        // Data storage
+        let appData = {
+            surgeryInfo: {},
+            medications: [],
+            checklist: [],
+            appointments: [],
+            documents: [],
+            audioRecordings: [],
+            speechTexts: [],
+            painEntries: [],
+            painMedications: [],
+            vitalSigns: [],
+            packingLists: {
+                standard: [],
+                custom: {}
+            }
+        };
+
+        // Initialize pain scale
+        const painScaleContainer = document.getElementById('painScale');
+        for (let i = 0; i <= 10; i++) {
+            const level = document.createElement('div');
+            level.className = 'pain-level';
+            level.textContent = i;
+            level.dataset.level = i;
+            
+            // Color gradient from green to red
+            const hue = (10 - i) * 12; // 120 (green) to 0 (red)
+            level.style.backgroundColor = `hsl(${hue}, 70%, 50%)`;
+            level.style.color = 'white';
+            
+            level.onclick = () => selectPainLevel(i);
+            painScaleContainer.appendChild(level);
+        }
+
+        let selectedPainLevel = null;
+
+        function selectPainLevel(level) {
+            selectedPainLevel = level;
+            document.querySelectorAll('.pain-level').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`[data-level="${level}"]`).classList.add('selected');
+        }
+
+        // Initialize default checklist
+        const defaultChecklist = [
+            'Personalausweis/Versichertenkarte einpacken',
+            'OP-Aufklärung unterschrieben mitbringen',
+            'Einweisungsschein vorbereiten',
+            'Wichtige Medikamente einpacken',
+            'Bequeme Kleidung einpacken',
+            'Körperpflege-Artikel einpacken',
+            'Ladekabel für Handy einpacken',
+            'Nüchtern bleiben (6h vorher keine Nahrung)',
+            'Nagellack entfernen',
+            'Schmuck ablegen',
+            'Kontaktlinsen entfernen'
+        ];
+
+        function initializeApp() {
+            loadData();
+            
+            if (appData.checklist.length === 0) {
+                appData.checklist = defaultChecklist.map(item => ({
+                    text: item,
+                    completed: false
+                }));
+            }
+            
+            renderChecklist();
+            renderMedications();
+            renderAppointments();
+            renderDocuments();
+            renderAudioRecordings();
+            renderSavedTexts();
+            updateCountdown();
+            updateStats();
+            initializePackingLists();
+            updateCharts();
+            
+            setInterval(updateCountdown, 1000);
+        }
+
+        // Standard packing list items
+        const standardPackingItems = [
+            'Personalausweis',
+            'Versichertenkarte',
+            'Einweisungsschein',
+            'OP-Aufklärung',
+            'Medikamentenplan',
+            'Hausschuhe/Badelatschen',
+            'Bademantel/Morgenmantel',
+            'Schlafanzug/Nachthemd',
+            'Unterwäsche',
+            'Handtücher',
+            'Zahnbürste & Zahnpasta',
+            'Duschgel & Shampoo',
+            'Haarbürste/Kamm',
+            'Handy & Ladekabel',
+            'Kopfhörer',
+            'Buch/Zeitschrift',
+            'Brille (falls vorhanden)',
+            'Gehhilfen (falls benötigt)'
+        ];
+
+        function initializePackingLists() {
+            if (!appData.packingLists.standard || appData.packingLists.standard.length === 0) {
+                appData.packingLists.standard = standardPackingItems.map(item => ({
+                    text: item,
+                    checked: false,
+                    custom: false
+                }));
+            }
+            renderPackingLists();
+        }
+
+        function renderPackingLists() {
+            const standardList = document.getElementById('standardPackingList');
+            standardList.innerHTML = '';
+
+            appData.packingLists.standard.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'checklist-item' + (item.checked ? ' completed' : '');
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.checked;
+                checkbox.onchange = () => togglePackingItem('standard', index);
+                
+                const label = document.createElement('span');
+                label.textContent = item.text;
+                label.style.flex = '1';
+                
+                itemDiv.appendChild(checkbox);
+                itemDiv.appendChild(label);
+                
+                if (item.custom) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '🗑️';
+                    deleteBtn.onclick = () => deletePackingItem('standard', index);
+                    itemDiv.appendChild(deleteBtn);
+                }
+                
+                standardList.appendChild(itemDiv);
+            });
+
+            // Render custom lists
+            const customListsContainer = document.getElementById('customLists');
+            customListsContainer.innerHTML = '';
+
+            Object.keys(appData.packingLists.custom).forEach(listName => {
+                const listCard = document.createElement('div');
+                listCard.className = 'card';
+                listCard.style.marginTop = '20px';
+                
+                const header = document.createElement('div');
+                header.style.display = 'flex';
+                header.style.justifyContent = 'space-between';
+                header.style.alignItems = 'center';
+                header.style.marginBottom = '15px';
+                
+                const title = document.createElement('h3');
+                title.textContent = listName;
+                
+                const deleteListBtn = document.createElement('button');
+                deleteListBtn.className = 'btn btn-danger btn-small';
+                deleteListBtn.textContent = 'Liste löschen';
+                deleteListBtn.onclick = () => deleteCustomList(listName);
+                
+                header.appendChild(title);
+                header.appendChild(deleteListBtn);
+                listCard.appendChild(header);
+
+                // Add item input for this list
+                const addItemDiv = document.createElement('div');
+                addItemDiv.style.display = 'flex';
+                addItemDiv.style.gap = '10px';
+                addItemDiv.style.marginBottom = '15px';
+                
+                const itemInput = document.createElement('input');
+                itemInput.type = 'text';
+                itemInput.placeholder = 'Gegenstand hinzufügen...';
+                itemInput.style.flex = '1';
+                itemInput.id = `customItem-${listName}`;
+                
+                const addBtn = document.createElement('button');
+                addBtn.className = 'btn btn-primary btn-small';
+                addBtn.textContent = 'Hinzufügen';
+                addBtn.onclick = () => addItemToCustomList(listName);
+                
+                addItemDiv.appendChild(itemInput);
+                addItemDiv.appendChild(addBtn);
+                listCard.appendChild(addItemDiv);
+
+                // Render items
+                const itemsContainer = document.createElement('div');
+                appData.packingLists.custom[listName].forEach((item, index) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'checklist-item' + (item.checked ? ' completed' : '');
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = item.checked;
+                    checkbox.onchange = () => togglePackingItem(listName, index);
+                    
+                    const label = document.createElement('span');
+                    label.textContent = item.text;
+                    label.style.flex = '1';
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '🗑️';
+                    deleteBtn.onclick = () => deletePackingItem(listName, index);
+                    
+                    itemDiv.appendChild(checkbox);
+                    itemDiv.appendChild(label);
+                    itemDiv.appendChild(deleteBtn);
+                    itemsContainer.appendChild(itemDiv);
+                });
+                
+                listCard.appendChild(itemsContainer);
+                customListsContainer.appendChild(listCard);
+            });
+
+            saveData();
+        }
+
+        function togglePackingItem(listName, index) {
+            if (listName === 'standard') {
+                appData.packingLists.standard[index].checked = !appData.packingLists.standard[index].checked;
+            } else {
+                appData.packingLists.custom[listName][index].checked = !appData.packingLists.custom[listName][index].checked;
+            }
+            renderPackingLists();
+        }
+
+        function addCustomPackItem() {
+            const input = document.getElementById('customPackItem');
+            const text = input.value.trim();
+            
+            if (text) {
+                appData.packingLists.standard.push({
+                    text: text,
+                    checked: false,
+                    custom: true
+                });
+                input.value = '';
+                renderPackingLists();
+            }
+        }
+
+        function deletePackingItem(listName, index) {
+            if (confirm('Möchten Sie diesen Gegenstand wirklich löschen?')) {
+                if (listName === 'standard') {
+                    appData.packingLists.standard.splice(index, 1);
+                } else {
+                    appData.packingLists.custom[listName].splice(index, 1);
+                }
+                renderPackingLists();
+            }
+        }
+
+        function createCustomList() {
+            const input = document.getElementById('customListName');
+            const name = input.value.trim();
+            
+            if (name && !appData.packingLists.custom[name]) {
+                appData.packingLists.custom[name] = [];
+                input.value = '';
+                renderPackingLists();
+            } else if (appData.packingLists.custom[name]) {
+                alert('Eine Liste mit diesem Namen existiert bereits!');
+            }
+        }
+
+        function addItemToCustomList(listName) {
+            const input = document.getElementById(`customItem-${listName}`);
+            const text = input.value.trim();
+            
+            if (text) {
+                appData.packingLists.custom[listName].push({
+                    text: text,
+                    checked: false
+                });
+                input.value = '';
+                renderPackingLists();
+            }
+        }
+
+        function deleteCustomList(listName) {
+            if (confirm(`Möchten Sie die Liste "${listName}" wirklich löschen?`)) {
+                delete appData.packingLists.custom[listName];
+                renderPackingLists();
+            }
+        }
+
+        // File upload handling
+        const fileDropZone = document.getElementById('fileDropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        fileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.add('dragover');
+        });
+
+        fileDropZone.addEventListener('dragleave', () => {
+            fileDropZone.classList.remove('dragover');
+        });
+
+        fileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const docType = document.getElementById('docType').value;
+            
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    appData.documents.push({
+                        name: file.name,
+                        type: docType,
+                        dataUrl: e.target.result,
+                        date: new Date().toISOString()
+                    });
+                    renderDocuments();
+                    saveData();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderDocuments() {
+            const container = document.getElementById('uploadedFiles');
+            container.innerHTML = '';
+
+            if (appData.documents.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Noch keine Dokumente hochgeladen</p>';
+                return;
+            }
+
+            // Group by type
+            const grouped = {};
+            appData.documents.forEach(doc => {
+                if (!grouped[doc.type]) grouped[doc.type] = [];
+                grouped[doc.type].push(doc);
+            });
+
+            Object.keys(grouped).forEach(type => {
+                const typeHeader = document.createElement('h3');
+                typeHeader.style.marginTop = '20px';
+                typeHeader.style.marginBottom = '10px';
+                const typeLabels = {
+                    'aufklärung': '📋 OP-Aufklärungen',
+                    'wunde': '🩹 Wunddokumentation',
+                    'heilung': '💚 Heilungsverlauf',
+                    'befund': '🔬 Befunde/Laborwerte',
+                    'rezept': '💊 Rezepte',
+                    'sonstiges': '📄 Sonstiges'
+                };
+                typeHeader.textContent = typeLabels[type] || type;
+                container.appendChild(typeHeader);
+
+                grouped[type].forEach((doc, index) => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'uploaded-file';
+
+                    if (doc.dataUrl.startsWith('data:image')) {
+                        const img = document.createElement('img');
+                        img.src = doc.dataUrl;
+                        fileDiv.appendChild(img);
+                    } else {
+                        const icon = document.createElement('div');
+                        icon.textContent = '📄';
+                        icon.style.fontSize = '2rem';
+                        icon.style.marginRight = '12px';
+                        fileDiv.appendChild(icon);
+                    }
+
+                    const info = document.createElement('div');
+                    info.className = 'file-info';
+                    info.innerHTML = `
+                        <div><strong>${doc.name}</strong></div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                            ${new Date(doc.date).toLocaleDateString('de-DE')}
+                        </div>
+                    `;
+                    fileDiv.appendChild(info);
+
+                    const viewBtn = document.createElement('button');
+                    viewBtn.className = 'btn btn-primary btn-small';
+                    viewBtn.textContent = '👁️ Ansehen';
+                    viewBtn.onclick = () => {
+                        window.open(doc.dataUrl, '_blank');
+                    };
+                    fileDiv.appendChild(viewBtn);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn btn-danger btn-small';
+                    deleteBtn.textContent = '🗑️';
+                    deleteBtn.onclick = () => {
+                        if (confirm('Dokument wirklich löschen?')) {
+                            appData.documents = appData.documents.filter(d => d !== doc);
+                            renderDocuments();
+                            saveData();
+                        }
+                    };
+                    fileDiv.appendChild(deleteBtn);
+
+                    container.appendChild(fileDiv);
+                });
+            });
+        }
+
+        // Speech recognition
+        let recognition;
+        let isRecognizing = false;
+
+        function startSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Spracherkennung wird von Ihrem Browser nicht unterstützt. Bitte verwenden Sie Chrome oder Edge.');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'de-DE';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = () => {
+                isRecognizing = true;
+                document.getElementById('startSpeechBtn').classList.add('hidden');
+                document.getElementById('stopSpeechBtn').classList.remove('hidden');
+                document.getElementById('speechIndicator').classList.remove('hidden');
+            };
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                document.getElementById('transcribedText').value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                stopSpeechRecognition();
+            };
+
+            recognition.onend = () => {
+                if (isRecognizing) {
+                    recognition.start(); // Restart if still recording
+                }
+            };
+
+            recognition.start();
+        }
+
+        function stopSpeechRecognition() {
+            isRecognizing = false;
+            if (recognition) {
+                recognition.stop();
+            }
+            document.getElementById('startSpeechBtn').classList.remove('hidden');
+            document.getElementById('stopSpeechBtn').classList.add('hidden');
+            document.getElementById('speechIndicator').classList.add('hidden');
+        }
+
+        function saveSpeechText() {
+            const text = document.getElementById('transcribedText').value.trim();
+            if (text) {
+                appData.speechTexts.push({
+                    text: text,
+                    date: new Date().toISOString()
+                });
+                alert('Text gespeichert!');
+                document.getElementById('transcribedText').value = '';
+                renderSavedTexts();
+                saveData();
+            }
+        }
+
+        function renderSavedTexts() {
+            const container = document.getElementById('savedTexts');
+            container.innerHTML = '';
+
+            if (appData.speechTexts.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Noch keine Texte gespeichert</p>';
+                return;
+            }
+
+            appData.speechTexts.forEach((item, index) => {
+                const textDiv = document.createElement('div');
+                textDiv.className = 'card';
+                textDiv.style.marginBottom = '15px';
+                textDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <strong>${new Date(item.date).toLocaleString('de-DE')}</strong>
+                        <button class="btn btn-danger btn-small" onclick="deleteSpeechText(${index})">🗑️ Löschen</button>
+                    </div>
+                    <p style="white-space: pre-wrap;">${item.text}</p>
+                `;
+                container.appendChild(textDiv);
+            });
+        }
+
+        function deleteSpeechText(index) {
+            if (confirm('Text wirklich löschen?')) {
+                appData.speechTexts.splice(index, 1);
+                renderSavedTexts();
+                saveData();
+            }
+        }
+
+        // Audio recording
+        let mediaRecorder;
+        let audioChunks = [];
+
+        function startAudioRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            appData.audioRecordings.push({
+                                dataUrl: reader.result,
+                                date: new Date().toISOString()
+                            });
+                            renderAudioRecordings();
+                            saveData();
+                        };
+                        reader.readAsDataURL(audioBlob);
+                        
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    mediaRecorder.start();
+                    document.getElementById('startAudioBtn').classList.add('hidden');
+                    document.getElementById('stopAudioBtn').classList.remove('hidden');
+                    document.getElementById('audioIndicator').classList.remove('hidden');
+                })
+                .catch(err => {
+                    alert('Mikrofon-Zugriff wurde verweigert oder ist nicht verfügbar.');
+                    console.error('Audio error:', err);
+                });
+        }
+
+        function stopAudioRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                document.getElementById('startAudioBtn').classList.remove('hidden');
+                document.getElementById('stopAudioBtn').classList.add('hidden');
+                document.getElementById('audioIndicator').classList.add('hidden');
+            }
+        }
+
+        function renderAudioRecordings() {
+            const container = document.getElementById('audioRecordings');
+            container.innerHTML = '';
+
+            if (appData.audioRecordings.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Noch keine Aufnahmen vorhanden</p>';
+                return;
+            }
+
+            appData.audioRecordings.forEach((recording, index) => {
+                const audioDiv = document.createElement('div');
+                audioDiv.className = 'card';
+                audioDiv.style.marginBottom = '15px';
+                audioDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong>Aufnahme vom ${new Date(recording.date).toLocaleString('de-DE')}</strong>
+                        <button class="btn btn-danger btn-small" onclick="deleteAudioRecording(${index})">🗑️ Löschen</button>
+                    </div>
+                    <audio controls class="audio-player" src="${recording.dataUrl}"></audio>
+                `;
+                container.appendChild(audioDiv);
+            });
+        }
+
+        function deleteAudioRecording(index) {
+            if (confirm('Aufnahme wirklich löschen?')) {
+                appData.audioRecordings.splice(index, 1);
+                renderAudioRecordings();
+                saveData();
+            }
+        }
+
+        // Pain tracking
+        function addPainEntry() {
+            if (selectedPainLevel === null) {
+                alert('Bitte wählen Sie eine Schmerzstärke aus!');
+                return;
+            }
+
+            const dateTime = document.getElementById('painDateTime').value;
+            const notes = document.getElementById('painNotes').value;
+
+            if (!dateTime) {
+                alert('Bitte Datum und Uhrzeit eingeben!');
+                return;
+            }
+
+            appData.painEntries.push({
+                level: selectedPainLevel,
+                dateTime: dateTime,
+                notes: notes
+            });
+
+            selectedPainLevel = null;
+            document.querySelectorAll('.pain-level').forEach(el => el.classList.remove('selected'));
+            document.getElementById('painDateTime').value = '';
+            document.getElementById('painNotes').value = '';
+
+            updateCharts();
+            saveData();
+            alert('Schmerz dokumentiert!');
+        }
+
+        function addPainMedication() {
+            const name = document.getElementById('painMedName').value.trim();
+            const dose = document.getElementById('painMedDose').value.trim();
+            const time = document.getElementById('painMedTime').value;
+
+            if (!name || !dose || !time) {
+                alert('Bitte alle Felder ausfüllen!');
+                return;
+            }
+
+            appData.painMedications.push({
+                name: name,
+                dose: dose,
+                time: time
+            });
+
+            document.getElementById('painMedName').value = '';
+            document.getElementById('painMedDose').value = '';
+            document.getElementById('painMedTime').value = '';
+
+            updateCharts();
+            saveData();
+            alert('Schmerzmittel-Einnahme dokumentiert!');
+        }
+
+        // Vital signs
+        function addVitalSigns() {
+            const systolic = document.getElementById('bpSystolic').value;
+            const diastolic = document.getElementById('bpDiastolic').value;
+            const pulse = document.getElementById('pulse').value;
+            const dateTime = document.getElementById('vitalDateTime').value;
+
+            if (!systolic || !diastolic || !pulse || !dateTime) {
+                alert('Bitte alle Felder ausfüllen!');
+                return;
+            }
+
+            appData.vitalSigns.push({
+                systolic: parseInt(systolic),
+                diastolic: parseInt(diastolic),
+                pulse: parseInt(pulse),
+                dateTime: dateTime
+            });
+
+            document.getElementById('bpSystolic').value = '';
+            document.getElementById('bpDiastolic').value = '';
+            document.getElementById('pulse').value = '';
+            document.getElementById('vitalDateTime').value = '';
+
+            renderVitalHistory();
+            updateCharts();
+            saveData();
+            alert('Messung hinzugefügt!');
+        }
+
+        function renderVitalHistory() {
+            const container = document.getElementById('vitalHistory');
+            container.innerHTML = '';
+
+            if (appData.vitalSigns.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Noch keine Messungen vorhanden</p>';
+                return;
+            }
+
+            appData.vitalSigns.slice().reverse().forEach((vital, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'measurement-entry';
+                entry.innerHTML = `
+                    <div>
+                        <strong>${new Date(vital.dateTime).toLocaleString('de-DE')}</strong><br>
+                        <span style="color: var(--text-secondary);">
+                            Blutdruck: ${vital.systolic}/${vital.diastolic} mmHg | Puls: ${vital.pulse} /min
+                        </span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteVitalSign(${appData.vitalSigns.length - 1 - index})">🗑️</button>
+                `;
+                container.appendChild(entry);
+            });
+        }
+
+        function deleteVitalSign(index) {
+            if (confirm('Messung wirklich löschen?')) {
+                appData.vitalSigns.splice(index, 1);
+                renderVitalHistory();
+                updateCharts();
+                saveData();
+            }
+        }
+
+        function updateCharts() {
+            // Pain chart
+            if (appData.painEntries.length > 0) {
+                const sortedPain = appData.painEntries.slice().sort((a, b) => 
+                    new Date(a.dateTime) - new Date(b.dateTime)
+                );
+                painChart.update({
+                    labels: sortedPain.map(e => new Date(e.dateTime).toLocaleDateString('de-DE')),
+                    datasets: [{
+                        label: 'Schmerzlevel',
+                        data: sortedPain.map(e => e.level),
+                        borderColor: '#ef4444'
+                    }]
+                });
+            }
+
+            // Pain medication chart
+            if (appData.painMedications.length > 0) {
+                const sortedMeds = appData.painMedications.slice().sort((a, b) => 
+                    new Date(a.time) - new Date(b.time)
+                );
+                const medCounts = {};
+                sortedMeds.forEach(med => {
+                    const date = new Date(med.time).toLocaleDateString('de-DE');
+                    medCounts[date] = (medCounts[date] || 0) + 1;
+                });
+                painMedChart.update({
+                    labels: Object.keys(medCounts),
+                    datasets: [{
+                        label: 'Einnahmen',
+                        data: Object.values(medCounts),
+                        borderColor: '#f59e0b'
+                    }]
+                });
+            }
+
+            // Blood pressure chart
+            if (appData.vitalSigns.length > 0) {
+                const sortedVitals = appData.vitalSigns.slice().sort((a, b) => 
+                    new Date(a.dateTime) - new Date(b.dateTime)
+                );
+                bpChart.update({
+                    labels: sortedVitals.map(v => new Date(v.dateTime).toLocaleDateString('de-DE')),
+                    datasets: [
+                        {
+                            label: 'Systolisch',
+                            data: sortedVitals.map(v => v.systolic),
+                            borderColor: '#ef4444'
+                        },
+                        {
+                            label: 'Diastolisch',
+                            data: sortedVitals.map(v => v.diastolic),
+                            borderColor: '#3b82f6'
+                        }
+                    ]
+                });
+
+                // Pulse chart
+                pulseChart.update({
+                    labels: sortedVitals.map(v => new Date(v.dateTime).toLocaleDateString('de-DE')),
+                    datasets: [{
+                        label: 'Puls',
+                        data: sortedVitals.map(v => v.pulse),
+                        borderColor: '#10b981'
+                    }]
+                });
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Surgery info
+        function saveSurgeryInfo() {
+            appData.surgeryInfo = {
+                type: document.getElementById('surgeryType').value,
+                date: document.getElementById('surgeryDate').value,
+                time: document.getElementById('surgeryTime').value,
+                hospital: document.getElementById('hospital').value,
+                surgeon: document.getElementById('surgeon').value,
+                anesthesia: document.getElementById('anesthesia').value,
+                notes: document.getElementById('surgeryNotes').value
+            };
+            saveData();
+            updateCountdown();
+            alert('OP-Informationen gespeichert!');
+        }
+
+        // Medications
+        function addMedication() {
+            const name = document.getElementById('medName').value.trim();
+            const dosage = document.getElementById('medDosage').value.trim();
+            const times = document.getElementById('medTimes').value.trim();
+            const notes = document.getElementById('medNotes').value.trim();
+
+            if (!name || !dosage) {
+                alert('Bitte mindestens Name und Dosierung eingeben!');
+                return;
+            }
+
+            appData.medications.push({ name, dosage, times, notes });
+            document.getElementById('medName').value = '';
+            document.getElementById('medDosage').value = '';
+            document.getElementById('medTimes').value = '';
+            document.getElementById('medNotes').value = '';
+            
+            renderMedications();
+            saveData();
+        }
+
+        function renderMedications() {
+            const container = document.getElementById('medicationList');
+            container.innerHTML = '';
+
+            appData.medications.forEach((med, index) => {
+                const medDiv = document.createElement('div');
+                medDiv.className = 'medication-item';
+                medDiv.innerHTML = `
+                    <div>
+                        <strong>${med.name}</strong> - ${med.dosage}<br>
+                        ${med.times ? `<span style="color: var(--text-secondary);">⏰ ${med.times}</span><br>` : ''}
+                        ${med.notes ? `<span style="color: var(--text-secondary);">📝 ${med.notes}</span>` : ''}
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="deleteMedication(${index})">🗑️ Löschen</button>
+                `;
+                container.appendChild(medDiv);
+            });
+        }
+
+        function deleteMedication(index) {
+            if (confirm('Medikament wirklich löschen?')) {
+                appData.medications.splice(index, 1);
+                renderMedications();
+                saveData();
+            }
+        }
+
+        // Checklist
+        function renderChecklist() {
+            const container = document.getElementById('checklistItems');
+            container.innerHTML = '';
+
+            appData.checklist.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'checklist-item' + (item.completed ? ' completed' : '');
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.completed;
+                checkbox.onchange = () => toggleChecklistItem(index);
+                
+                const label = document.createElement('span');
+                label.textContent = item.text;
+                
+                itemDiv.appendChild(checkbox);
+                itemDiv.appendChild(label);
+                container.appendChild(itemDiv);
+            });
+
+            updateStats();
+        }
+
+        function toggleChecklistItem(index) {
+            appData.checklist[index].completed = !appData.checklist[index].completed;
+            renderChecklist();
+            saveData();
+        }
+
+        // Appointments
+        function addAppointment() {
+            const type = document.getElementById('aptType').value.trim();
+            const date = document.getElementById('aptDate').value;
+            const time = document.getElementById('aptTime').value;
+            const location = document.getElementById('aptLocation').value.trim();
+
+            if (!type || !date || !time) {
+                alert('Bitte alle Pflichtfelder ausfüllen!');
+                return;
+            }
+
+            appData.appointments.push({ type, date, time, location });
+            document.getElementById('aptType').value = '';
+            document.getElementById('aptDate').value = '';
+            document.getElementById('aptTime').value = '';
+            document.getElementById('aptLocation').value = '';
+            
+            renderAppointments();
+            saveData();
+        }
+
+        function renderAppointments() {
+            const container = document.getElementById('appointmentList');
+            container.innerHTML = '';
+
+            if (appData.appointments.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Noch keine Termine hinzugefügt</p>';
+                return;
+            }
+
+            appData.appointments.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+
+            appData.appointments.forEach((apt, index) => {
+                const aptDiv = document.createElement('div');
+                aptDiv.className = 'appointment-item';
+                aptDiv.innerHTML = `
+                    <div>
+                        <strong>${apt.type}</strong><br>
+                        <span style="color: var(--text-secondary);">
+                            📅 ${new Date(apt.date).toLocaleDateString('de-DE')} um ${apt.time}<br>
+                            ${apt.location ? `📍 ${apt.location}` : ''}
+                        </span>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="deleteAppointment(${index})">🗑️ Löschen</button>
+                `;
+                container.appendChild(aptDiv);
+            });
+        }
+
+        function deleteAppointment(index) {
+            if (confirm('Termin wirklich löschen?')) {
+                appData.appointments.splice(index, 1);
+                renderAppointments();
+                saveData();
+            }
+        }
+
+        // Countdown
+        function updateCountdown() {
+            if (!appData.surgeryInfo.date || !appData.surgeryInfo.time) {
+                document.getElementById('countdownDisplay').textContent = '--:--:--';
+                document.getElementById('countdownText').textContent = 'Noch nicht eingestellt';
+                return;
+            }
+
+            const surgeryDateTime = new Date(`${appData.surgeryInfo.date}T${appData.surgeryInfo.time}`);
+            const now = new Date();
+            const diff = surgeryDateTime - now;
+
+            if (diff < 0) {
+                document.getElementById('countdownDisplay').textContent = '00:00:00';
+                document.getElementById('countdownText').textContent = 'Operation erfolgt';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdownDisplay').textContent = 
+                `${days}d ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('countdownText').textContent = 
+                `${appData.surgeryInfo.type || 'Operation'} am ${new Date(appData.surgeryInfo.date).toLocaleDateString('de-DE')}`;
+        }
+
+        // Stats
+        function updateStats() {
+            const completed = appData.checklist.filter(item => item.completed).length;
+            const total = appData.checklist.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressBar').textContent = percentage + '%';
+        }
+
+        // Data persistence
+        function saveData() {
+            try {
+                const dataStr = JSON.stringify(appData);
+                // Store in memory only (no localStorage due to sandbox restrictions)
+                window.appDataBackup = dataStr;
+            } catch (e) {
+                console.error('Error saving data:', e);
+            }
+        }
+
+        function loadData() {
+            try {
+                // Try to load from memory backup
+                if (window.appDataBackup) {
+                    appData = JSON.parse(window.appDataBackup);
+                }
+                
+                // Load from form fields if available
+                if (document.getElementById('surgeryType').value) {
+                    appData.surgeryInfo.type = document.getElementById('surgeryType').value;
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        }
+
+        // Initialize app on load
+        window.addEventListener('load', initializeApp);
+
+        // Set current datetime for inputs
+        window.addEventListener('load', () => {
+            const now = new Date();
+            const dateTimeString = now.toISOString().slice(0, 16);
+            
+            document.getElementById('painDateTime').value = dateTimeString;
+            document.getElementById('painMedTime').value = dateTimeString;
+            document.getElementById('vitalDateTime').value = dateTimeString;
+        });
+    </script>
+</body>
+</html>
+
